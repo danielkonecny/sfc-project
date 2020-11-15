@@ -33,11 +33,14 @@ zip:
 	zip $(LOGIN).zip *.$(SUFFIX) *.h Makefile docs.pdf
 
 # Binary
-$(PROJECT): $(PROJECT).o
+$(PROJECT): $(PROJECT).o params.o
 	$(PP) $(PFLAGS) $^ -o $@
 
 # Object files
 $(PROJECT).o: $(PROJECT).$(SUFFIX) $(PROJECT).h
+	$(PP) $(PFLAGS) -c $< -o $@
+
+params.o: params.$(SUFFIX) params.h
 	$(PP) $(PFLAGS) -c $< -o $@
 
 
