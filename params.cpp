@@ -5,6 +5,8 @@
 #include<stdlib.h>
 #include<fstream>
 
+#include"params.h"
+
 void print_help() {
 	// TODO
 	std::cout << "HELP!" << std::endl;
@@ -103,76 +105,91 @@ std::vector<int> parse_weights_file(std::string weights_file) {
 	return weights;
 }
 
-std::vector<int> parse_prices_cmd(std::string prices_cmd) {
-	std::vector<int> prices;
-	std::vector<std::string> prices_string;
+std::vector<int> parse_profits_cmd(std::string profits_cmd) {
+	std::vector<int> profits;
+	std::vector<std::string> profits_string;
 	const std::string delimiter = ",";
 	size_t string_index;
 
-	while((string_index = prices_cmd.find(delimiter)) != std::string::npos) {
-		prices_string.push_back(prices_cmd.substr(0, string_index));
-		prices_cmd.erase(0, string_index + delimiter.length());
+	while((string_index = profits_cmd.find(delimiter)) != std::string::npos) {
+		profits_string.push_back(profits_cmd.substr(0, string_index));
+		profits_cmd.erase(0, string_index + delimiter.length());
 	}
-	prices_string.push_back(prices_cmd.substr(0, string_index));
+	profits_string.push_back(profits_cmd.substr(0, string_index));
 
-	for(auto price_string = prices_string.begin(); price_string != prices_string.end(); price_string++) {
+	for(auto profit_string = profits_string.begin(); profit_string != profits_string.end(); profit_string++) {
 		char *pEnd;
-		int price;
+		int profit;
 
-		price = (int)strtol((*price_string).c_str(), &pEnd, 10);
+		profit = (int)strtol((*profit_string).c_str(), &pEnd, 10);
 
 		if(*pEnd != '\0') {
-			std::cerr << "Given price is not an integer: " << *price_string << std::endl;
-			price = -1;
+			std::cerr << "Given profit is not an integer: " << *profit_string << std::endl;
+			profit = -1;
 		}
 		
-		prices.push_back(price);
+		profits.push_back(profit);
 	}
 
-	return prices;
+	return profits;
 	
 }
 
-std::vector<int> parse_prices_file(std::string prices_file) {
-	std::vector<int> prices;
-	std::vector<std::string> prices_string;
-	std::string price_line;
-	std::ifstream infile(prices_file);
+std::vector<int> parse_profits_file(std::string profits_file) {
+	std::vector<int> profits;
+	std::vector<std::string> profits_string;
+	std::string profit_line;
+	std::ifstream infile(profits_file);
 
-	while(std::getline(infile, price_line)) {
-		prices_string.push_back(price_line);
+	while(std::getline(infile, profit_line)) {
+		profits_string.push_back(profit_line);
 	}
 
-	for(auto price_string = prices_string.begin(); price_string != prices_string.end(); price_string++) {
+	for(auto profit_string = profits_string.begin(); profit_string != profits_string.end(); profit_string++) {
 		char *pEnd;
-		int price;
+		int profit;
 
-		price = (int)strtol((*price_string).c_str(), &pEnd, 10);
+		profit = (int)strtol((*profit_string).c_str(), &pEnd, 10);
 
 		if(*pEnd != '\0') {
-			std::cerr << "Given price is not an integer: " << *price_string << std::endl;
-			price = -1;
+			std::cerr << "Given profit is not an integer: " << *profit_string << std::endl;
+			profit = -1;
 		}
 		
-		prices.push_back(price);
+		profits.push_back(profit);
 	}
 
-	return prices;
+	return profits;
 }
 
-int check_params(int *capacity, std::vector<int> *weights, std::vector<int> *prices) {
-	(void)capacity;
-	(void)weights;
-	(void)prices;
-	// TODO - check if capacity, all weights and all prices are > 0 
-	// TODO - check if weights vector is longer than 0
-	// TODO - check if prices vector is longer than 0
-	// TODO - check if weights and prices vector lengths match
+int check_params(int *capacity, int *objects, std::vector<int> *weights, std::vector<int> *profits) {
+	if(*capacity <= 0)
+		return -1;
+
+	for(auto weight = weights->begin(); weight != weights->end(); weight++)
+		if(*weight <= 0)
+			return -2;
+
+	for(auto profit = profits->begin(); profit != profits->end(); profit++)
+		if(*profit <= 0)
+			return -3;
+
+	if(weights->size() <= 0)
+		return -2;
+
+	if(profits->size() <= 0)
+		return -3;
+
+	if(weights->size() != profits->size())
+		return -4;
+
+	*objects = weights->size();
+
 	return 0;
 }
 
-int parse_params(int argc, char *argv[], int *capacity, \
-	std::vector<int> *weights, std::vector<int> *prices) {
+int parse_params(int argc, char *argv[], int *capacity, int *objects, \
+	std::vector<int> *weights, std::vector<int> *profits) {
 
 	// TODO - expand for long options
 	int option;
@@ -198,10 +215,10 @@ int parse_params(int argc, char *argv[], int *capacity, \
 				*weights = parse_weights_file(optarg);
 				break;
 			case 'p':
-				*prices = parse_prices_cmd(optarg);
+				*profits = parse_profits_cmd(optarg);
 				break;
 			case 'P':
-				*prices = parse_prices_file(optarg);
+				*profits = parse_profits_file(optarg);
 				break;
 			case '?':
 				std::cerr << "Unknown parameter: " << char(optopt) << std::endl;
@@ -209,5 +226,5 @@ int parse_params(int argc, char *argv[], int *capacity, \
 		}
 	}
 
-	return check_params(capacity, weights, prices);
+	return check_params(capacity, objects, weights, profits);
 }
