@@ -9,7 +9,7 @@
 # Macros
 PP = g++
 SUFFIX = cpp
-PFLAGS = -Wall -Wextra -pedantic -O3
+PFLAGS = -Wall -Wextra -pedantic
 LIB = 
 PROJECT = knapsack
 LOGIN = xkonec75
@@ -20,7 +20,7 @@ all: $(PROJECT)
 run: $(PROJECT)
 	./$(PROJECT)
 
-# Run like "make test TEST=x" with 'x' as the number of test (now from 01 to 08).
+# Run like "make test TEST=xx" with 'xx' as the number of test (now from 01 to 08 and 10).
 test: $(PROJECT)
 	./$(PROJECT) -C "datasets/p$(TEST)_c.txt" -W "datasets/p$(TEST)_w.txt" -P "datasets/p$(TEST)_p.txt"
 
@@ -37,17 +37,17 @@ zip:
 	zip $(LOGIN).zip *.$(SUFFIX) *.h Makefile docs.pdf
 
 # Binary
-$(PROJECT): $(PROJECT).o Bird.o mbo.o params.o
+$(PROJECT): $(PROJECT).o mbo.o Bird.o params.o
 	$(PP) $(PFLAGS) $^ -o $@
 
 # Object files
 $(PROJECT).o: $(PROJECT).$(SUFFIX) $(PROJECT).h
 	$(PP) $(PFLAGS) -c $< -o $@
 
-Bird.o: Bird.$(SUFFIX) Bird.h
+mbo.o: mbo.$(SUFFIX) mbo.h
 	$(PP) $(PFLAGS) -c $< -o $@
 
-mbo.o: mbo.$(SUFFIX) mbo.h
+Bird.o: Bird.$(SUFFIX) Bird.h
 	$(PP) $(PFLAGS) -c $< -o $@
 
 params.o: params.$(SUFFIX) params.h

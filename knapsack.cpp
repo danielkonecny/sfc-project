@@ -3,44 +3,51 @@
 #include<vector>
 
 #include"Bird.h"
-#include"mbo.h"
 #include"params.h"
 
 int main(int argc, char *argv[])
 {
+	const int neighbor_count = 3;
+
 	int params_state;
 
 	int capacity;
-	int objects;
+	int item_count;
 	std::vector<int> weights;
 	std::vector<int> profits;
 
-	params_state = parse_params(argc, argv, &capacity, &objects, &weights, &profits);
+	params_state = parse_params(argc, argv, &capacity, &item_count, &weights, &profits);
 
 	if(params_state < 0) {
 		return params_state;
 	}
 	else if(params_state == 0) {
-		std::cout << "Capacity: " << capacity << std::endl;
+		Mbo mbo(capacity, item_count, weights, profits);
 
-		std::cout << "Number of items: " << objects << std::endl; 
-		
-		std::cout << "Weights: ";
-		for(auto weight = weights.begin(); weight != weights.end(); weight++) {
-			std::cout << *weight << " ";
-		}
-		std::cout << std::endl;
+		mbo.printMe();
 
-		std::cout << "Profits: ";
-		for(auto profit = profits.begin(); profit != profits.end(); profit++) {
-			std::cout << *profit << " ";
-		}
-		std::cout << std::endl;
+		Bird bird(mbo);
+		bird.initBird();
+		bird.printMe();
 
-		Bird bird(capacity, objects, weights);
-		std::cout << "Configuration: " << bird.get_config() << std::endl;
-		std::cout << "Load: " << bird.get_load(weights) << std::endl;
-		std::cout << "Profit: " << bird.get_profit(profits) << std::endl;
+		std::vector<Bird> neighbors(neighbor_count, bird);
+
+		bird.findNeighbors(&neighbors);
+
+		for(auto &neighbor : neighbors)
+			neighbor.printMe();
+
+		/*
+		Bird neighbor(mbo);
+		bird.findNeighbors(&neighbor);
+		neighbor.printMe();
+		*/
+
+		/*
+		Bird neighbor(mbo);
+		neighbor.findNeighbors(capacity, item_count, weights, configuration);
+		neighbor.printMe();
+		*/
 	}
 
 	return 0;
