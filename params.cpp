@@ -1,19 +1,48 @@
-#include<iostream>
-#include<cstring>
-#include<vector>
-#include<unistd.h>
-#include<stdlib.h>
-#include<fstream>
+#include <iostream>
+#include <cstring>
+#include <vector>
+#include <unistd.h>
+#include <stdlib.h>
+#include <fstream>
 
-#include"params.h"
+#include "params.h"
 
 void print_help() {
-	// TODO
-	std::cout << "HELP!" << std::endl;
+	std::cout << std::endl;
+	std::cout << "Migrating Birds Optimization Knapsack Problem 01 Solver";
+	std::cout << std::endl << "HELP" << std::endl;
+	std::cout << "-h - optional - print help command" << std::endl;
+	std::cout << "-v - optional - print application version" << std::endl;
+	std::cout << "-i - optional - if used, information about optimization will be printed to stdout" << std::endl;
+	std::cout << "-t - optional (argument) - print help command" << std::endl;
+	std::cout << "-c - optional (argument) - capacity of the knapsack given by an integer" << std::endl;
+	std::cout << "-C - optional (argument) - capacity of the knapsack given by an integer in a file" << std::endl;
+	std::cout << "-w - optional (argument) - weight of each item separated by comma" << std::endl;
+	std::cout << "-W - optional (argument) - weight of each item spearated by a new line in a file" << std::endl;
+	std::cout << "-p - optional (argument) - price of each item separated by comma" << std::endl;
+	std::cout << "-P - optional (argument) - price of each item separated by a new line in a file" << std::endl;
+	std::cout << "-s - optional (argument) - solution of the problem, 0/1 values separated by comma" << std::endl;
+	std::cout << "-S - optional (argument) - solution of the problem, 0/1 values separated by a new line in a file" << std::endl;
 }
 
 void print_version() {
-	std::cout << "MBO Knapsack Problem 01 Solver - v1.0!" << std::endl;
+	std::cout << std::endl;
+	std::cout << "Migrating Birds Optimization Knapsack Problem 01 Solver";
+	std::cout << std::endl << "VERSION 1.0" << std::endl << std::endl;
+}
+
+int parse_test(std::string test_cmd) {
+	int test;
+	char *pEnd;
+
+	test = (int)strtol(test_cmd.c_str(), &pEnd, 10);
+
+	if(*pEnd != '\0') {
+		std::cerr << "Given test number is not an integer: " << test_cmd << std::endl;
+		test = -1;
+	}
+	
+	return test;
 }
 
 int parse_capacity_cmd(std::string capacity_cmd) {
@@ -218,67 +247,61 @@ std::vector<int> parse_solutions_file(std::string solutions_file) {
 	return solutions;
 }
 
-int check_params(int *capacity, int *objects, std::vector<int> *weights,
-	std::vector<int> *profits, std::vector<int> *solutions) {
-
-	if(*capacity <= 0) {
-		std::cerr << "Capacity too low: " << *capacity << std::endl;
+int check_params(Knapsack *knapsack) {
+	if(knapsack->getCapacity() <= 0) {
+		std::cerr << "Capacity too low: " << knapsack->getCapacity() << std::endl;
 		return -1;
 	}
-
-	for(auto &weight : *weights) {
+	for(auto &weight : knapsack->getWeights()) {
 		if(weight <= 0){
 			std::cerr << "Weight too low: " << weight << std::endl;
 			return -2;
 		}
 	}
-
-	for(auto &profit : *profits){
+	for(auto &profit : knapsack->getProfits()) {
 		if(profit <= 0){
 			std::cerr << "Profit too low: " << profit << std::endl;
 			return -3;
 		}
 	}
-
-	for(auto &solution : *solutions){
+	for(auto &solution : knapsack->getSolutions()) {
 		if(solution != 0 && solution != 1){
 			std::cerr << "Solution not binary: " << solution << std::endl;
 			return -4;
 		}
 	}
-
-	if(weights->size() <= 0){
-		std::cerr << "Not enough weights: " << weights->size() << std::endl;
+	if(knapsack->getWeights().size() <= 0) {
+		std::cerr << "Not enough weights: " << knapsack->getWeights().size() << std::endl;
 		return -2;
 	}
-
-	if(profits->size() <= 0){
-		std::cerr << "Not enough profits: " << profits->size() << std::endl;
+	if(knapsack->getWeights().size() <= 0) {
+		std::cerr << "Not enough profits: " << knapsack->getWeights().size() << std::endl;
 		return -3;
 	}
-
-	if(solutions->size() <= 0){
-		std::cerr << "Not enough solutions: " << solutions->size() << std::endl;
+	if(knapsack->getSolutions().size() <= 0) {
+		std::cerr << "Not enough solutions: " << knapsack->getSolutions().size() << std::endl;
 		return -4;
 	}
-
-	if((weights->size() != profits->size()) || (weights->size() != solutions->size())){
+	if((knapsack->getWeights().size() != knapsack->getProfits().size())
+		|| (knapsack->getWeights().size() != knapsack->getSolutions().size())) {
 		std::cerr << "Number of weights, profits and solutions does not match." << std::endl;
 		return -5;
 	}
-
-	*objects = weights->size();
-
+	if(knapsack->getTestCount() <= 0) {
+		std::cerr << "Test Count is too low: " << knapsack->getTestCount() << std::endl;
+		return -6;
+	}
+	knapsack->setItemCount(knapsack->getWeights().size());
 	return 0;
 }
 
-int parse_params(int argc, char *argv[], int *capacity, int *objects,
-	std::vector<int> *weights, std::vector<int> *profits, std::vector<int> *solutions) {
+int parse_params(int argc, char *argv[], Knapsack *knapsack) {
 
-	// TODO - expand for long options
 	int option;
+	int check = 0;
+	int extension = 0;
 
-	while((option = getopt(argc, argv, "hvc:C:w:W:p:P:s:S:")) != -1) {
+	while((option = getopt(argc, argv, "hvit:c:C:w:W:p:P:s:S:")) != -1) {
 		switch(option) {
 			case 'h':
 				print_help();
@@ -286,29 +309,42 @@ int parse_params(int argc, char *argv[], int *capacity, int *objects,
 			case 'v':
 				print_version();
 				return 1;
+			case 'i':
+				extension = 2;
+				std::cout << std::endl;
+				std::cout << "Migrating Birds Optimization Knapsack Problem 01 Solver";
+				std::cout << std::endl << "INFORMATION MODE" << std::endl << std::endl;
+				break;
+			case 't':
+				extension = 3;
+				std::cout << std::endl;
+				std::cout << "Migrating Birds Optimization Knapsack Problem 01 Solver";
+				std::cout << std::endl << "TEST MODE" << std::endl << std::endl;
+				knapsack->setTestCount(parse_test(optarg));
+				break;
 			case 'c':
-				*capacity = parse_capacity_cmd(optarg);
+				knapsack->setCapacity(parse_capacity_cmd(optarg));
 				break;
 			case 'C':
-				*capacity = parse_capacity_file(optarg);
+				knapsack->setCapacity(parse_capacity_file(optarg));
 				break;
 			case 'w':
-				*weights = parse_weights_cmd(optarg);
+				knapsack->setWeights(parse_weights_cmd(optarg));
 				break;
 			case 'W':
-				*weights = parse_weights_file(optarg);
+				knapsack->setWeights(parse_weights_file(optarg));
 				break;
 			case 'p':
-				*profits = parse_profits_cmd(optarg);
+				knapsack->setProfits(parse_profits_cmd(optarg));
 				break;
 			case 'P':
-				*profits = parse_profits_file(optarg);
+				knapsack->setProfits(parse_profits_file(optarg));
 				break;
 			case 's':
-				*solutions = parse_solutions_cmd(optarg);
+				knapsack->setSolutions(parse_solutions_cmd(optarg));
 				break;
 			case 'S':
-				*solutions = parse_solutions_file(optarg);
+				knapsack->setSolutions(parse_solutions_file(optarg));
 				break;
 			case '?':
 				std::cerr << "Unknown parameter: " << char(optopt) << std::endl;
@@ -316,5 +352,12 @@ int parse_params(int argc, char *argv[], int *capacity, int *objects,
 		}
 	}
 
-	return check_params(capacity, objects, weights, profits, solutions);
+	check = check_params(knapsack);
+
+	if(check < 0)
+		print_help();
+	else if(check == 0)
+		check = extension;
+
+	return check;
 }

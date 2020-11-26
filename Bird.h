@@ -1,15 +1,17 @@
-#include"mbo.h"
+#ifndef BIRD_H
+#define BIRD_H
+
+#include "Knapsack.h"
 
 class Bird {
 private:
-	Mbo mbo;
+	Knapsack knapsack;
 	std::vector<int> configuration;
 
 public:
-	Bird(Mbo);
+	Bird(Knapsack);
 
 	void initBird();
-	void initBird(std::vector<std::vector<int>>);
 	void findNeighbors(std::vector<Bird>*);
 	void findNeighbors(std::vector<Bird>*, std::vector<Bird>*);
 	void improve(Bird);
@@ -17,7 +19,7 @@ public:
 	int getLoad();
 	std::vector<int> getConfiguration();
 	void setConfiguration(std::vector<int>);
-	void printMe();
+	void print();
 };
 
-void sortByProfit(std::vector<Bird> *birds);
+#endif
