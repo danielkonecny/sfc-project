@@ -14,7 +14,11 @@ std::vector<int> parse_profits_cmd(std::string profits_cmd);
 
 std::vector<int> parse_profits_file(std::string profits_file);
 
-int check_params(int *capacity, int *objects, std::vector<int> *weights, std::vector<int> *profits);
+std::vector<int> parse_solutions_cmd(std::string solutions_cmd);
+
+std::vector<int> parse_solutions_file(std::string solutions_file);
+
+int check_params(int *capacity, int *objects, std::vector<int> *weights, std::vector<int> *profits, std::vector<int> *solutions);
 
 int parse_params(int argc, char *argv[], int *capacity, int *objects, \
-	std::vector<int> *weights, std::vector<int> *profits);
+	std::vector<int> *weights, std::vector<int> *profits, std::vector<int> *solutions);

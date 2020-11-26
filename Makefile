@@ -1,6 +1,6 @@
 # Project: 		Migrating Birds Optimization Solving Knapsack Problem
 # File: 		Makefile
-# Version: 		0.1
+# Version: 		0.5
 # Course: 		SFC - Soft Computing
 # Organisation:	Brno University of Technology - Faculty of Information Technology
 # Author: 		Daniel Konecny (xkonec75)
@@ -20,9 +20,9 @@ all: $(PROJECT)
 run: $(PROJECT)
 	./$(PROJECT)
 
-# Run like "make test TEST=xx" with 'xx' as the number of test (now from 01 to 08 and 10).
+# Run like "make test TEST=xx" with 'xx' as the number of test (now 01-08, 10-14 and 16-20).
 test: $(PROJECT)
-	./$(PROJECT) -C "datasets/p$(TEST)_c.txt" -W "datasets/p$(TEST)_w.txt" -P "datasets/p$(TEST)_p.txt"
+	./$(PROJECT) -C "datasets/p$(TEST)_c.txt" -W "datasets/p$(TEST)_w.txt" -P "datasets/p$(TEST)_p.txt" -S "datasets/p$(TEST)_s.txt"
 
 clean:
 	rm *.o $(PROJECT)

@@ -38,6 +38,8 @@ int Mbo::getProfit(int index) {
 }
 
 void Mbo::printMe() {
+	std::cout << "KNAPSACK PROBLEM 01" << std::endl;
+
 	std::cout << "Capacity: " << this->capacity << std::endl;
 
 	std::cout << "Number of items: " << this->item_count << std::endl; 
