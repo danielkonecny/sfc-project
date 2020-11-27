@@ -40,10 +40,10 @@ clear:
 	rm *.o $(PROJECT)
 
 pack:
-	zip $(LOGIN).zip *.$(SUFFIX) *.h Makefile docs.pdf
+	zip -r $(LOGIN).zip datasets/ $(PROJECT) *.$(SUFFIX) *.h Makefile docs.pdf test_script.sh
 
 zip:
-	zip $(LOGIN).zip *.$(SUFFIX) *.h Makefile docs.pdf
+	zip -r $(LOGIN).zip datasets/ $(PROJECT) *.$(SUFFIX) *.h Makefile docs.pdf test_script.sh
 
 # Binary
 $(PROJECT): $(PROJECT).o Knapsack.o Bird.o Mbo.o params.o
